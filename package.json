@@ -1,0 +1,19 @@
+{
+  "name": "innov2grow-portal",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "dependencies": {
+    "@google/genai": "^0.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1"
+  }
+}
