@@ -1,6 +1,7 @@
-import { GoogleGenAI } from "@google/genai";
+import Groq from "groq-sdk";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const MODEL = "llama3-70b-8192";
 
 export async function generateDemoContent(businessType, goal, channel, businessName) {
   const prompt = `
@@ -51,17 +52,17 @@ Generate a complex JSON object exactly matching this schema. Make the data highl
     ]
   }
 }
-Generate ONLY valid JSON. No markdown formatting, no code blocks, just raw JSON text.
+Generate ONLY valid JSON. Do not use markdown formatting or code blocks. Just raw JSON.
 `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL,
+      response_format: { type: "json_object" },
     });
     
-    let text = response.text;
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.choices[0]?.message?.content || "{}";
     
     return {
       data: JSON.parse(text),
@@ -73,7 +74,7 @@ Generate ONLY valid JSON. No markdown formatting, no code blocks, just raw JSON 
     return {
       data: {
         "software": {
-          "architecture": "React frontend with a scalable Node.js/Express backend and PostgreSQL database.",
+          "architecture": "React frontend with a scalable Node.js backend and PostgreSQL database.",
           "files": [
             { "name": "index.html", "language": "html", "content": "<!DOCTYPE html>\n<html>\n<head><title>My App</title></head>\n<body><h1>Hello Innov2Grow</h1></body>\n</html>" },
             { "name": "styles.css", "language": "css", "content": "body { background: #000; color: #fff; font-family: sans-serif; text-align: center; margin-top: 50px; }" },
@@ -118,22 +119,21 @@ Innov2Grow specializes in 5 core services: Software Development, Digital Marketi
 Be concise, highly professional, persuasive, and ask questions to qualify the lead. Do not use markdown formatting heavily, keep it conversational.`;
 
   const formattedHistory = messages.map(msg => ({
-    role: msg.role === 'bot' ? 'model' : 'user',
-    parts: [{ text: msg.text }]
+    role: msg.role === 'bot' ? 'assistant' : 'user',
+    content: msg.text
   }));
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
-        { role: 'user', parts: [{ text: systemInstruction }] },
-        { role: 'model', parts: [{ text: 'Understood. I will act as the Innov2Grow consultant.' }] },
+    const response = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemInstruction },
         ...formattedHistory
       ],
+      model: MODEL,
     });
     
     return {
-      text: response.text,
+      text: response.choices[0]?.message?.content || "",
       isFallback: false
     };
   } catch (error) {
@@ -157,13 +157,13 @@ Generate ONLY valid JSON matching the exact schema of the 'Current Data' provide
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL,
+      response_format: { type: "json_object" },
     });
     
-    let text = response.text;
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.choices[0]?.message?.content || "{}";
     
     return {
       data: JSON.parse(text),
@@ -190,13 +190,13 @@ Make the JSON keys descriptive of the extracted or generated data (e.g., {"senti
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL,
+      response_format: { type: "json_object" },
     });
     
-    let text = response.text;
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.choices[0]?.message?.content || "{}";
     
     return {
       result: JSON.parse(text),
@@ -217,27 +217,30 @@ You are an expert AI Frontend Developer. The user has provided the following pro
 "${promptText}"
 
 Generate the HTML, CSS, and JS files for this website. Ensure the design is modern, visually stunning, dark-themed, and responsive.
-Return ONLY a valid JSON array of objects representing the files. Do not include markdown formatting or code blocks outside the JSON array.
-Each object must have exactly these keys: "name", "language", and "content".
+Return ONLY a valid JSON object with a key "files" that contains an array of file objects. Do not include markdown formatting or code blocks outside the JSON.
+Each file object must have exactly these keys: "name", "language", and "content".
 Example format:
-[
-  { "name": "index.html", "language": "html", "content": "<!DOCTYPE html>..." },
-  { "name": "styles.css", "language": "css", "content": "body { ... }" },
-  { "name": "app.js", "language": "javascript", "content": "console.log('hi');" }
-]
+{
+  "files": [
+    { "name": "index.html", "language": "html", "content": "<!DOCTYPE html>..." },
+    { "name": "styles.css", "language": "css", "content": "body { ... }" },
+    { "name": "app.js", "language": "javascript", "content": "console.log('hi');" }
+  ]
+}
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL,
+      response_format: { type: "json_object" },
     });
     
-    let text = response.text;
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.choices[0]?.message?.content || '{"files":[]}';
+    const parsed = JSON.parse(text);
     
     return {
-      files: JSON.parse(text),
+      files: parsed.files || [],
       isFallback: false
     };
   } catch (error) {
@@ -266,13 +269,13 @@ Return ONLY the final expanded caption as raw text. Do not use markdown blocks o
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const response = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: MODEL,
     });
     
     return {
-      enhancedText: response.text.trim(),
+      enhancedText: response.choices[0]?.message?.content?.trim() || "",
       isFallback: false
     };
   } catch (error) {
