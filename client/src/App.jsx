@@ -100,7 +100,7 @@ function App() {
             <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '16px', borderRadius: '8px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <AlertTriangle size={24} />
               <div>
-                <strong>Notice: AI Fallback Activated.</strong> The backend Gemini API key is missing or failed, so the system instantly fell back to static templated data to ensure the demo still loads under 5 seconds.
+                <strong>Notice: AI Fallback Activated.</strong> The backend Groq API key is missing or failed, so the system instantly fell back to static templated data to ensure the demo still loads under 5 seconds.
               </div>
             </div>
           )}
@@ -138,7 +138,7 @@ function App() {
               <button onClick={() => setShowPayload(false)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}><X size={24} /></button>
             </div>
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-              <h4 style={{ color: 'var(--accent-primary)', marginBottom: '8px' }}>1. Prompt Sent to Gemini 2.5 Flash</h4>
+              <h4 style={{ color: 'var(--accent-primary)', marginBottom: '8px' }}>1. Prompt Sent to Groq (Llama 3 70B)</h4>
               <pre style={{ background: 'rgba(0,0,0,0.3)', padding: '16px', borderRadius: '8px', whiteSpace: 'pre-wrap', wordWrap: 'break-word', fontSize: '0.85rem', color: '#a5b4fc', marginBottom: '24px' }}>
                 {demoData.prompt}
               </pre>
