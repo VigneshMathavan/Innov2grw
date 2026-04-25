@@ -107,10 +107,12 @@ Generate ONLY valid JSON. Do not use markdown formatting or code blocks. Just ra
         }
       },
       prompt: prompt,
-      isFallback: true
+      isFallback: true,
+      errorMsg: error.message || String(error)
     };
   }
 }
+
 
 export async function handleChat(messages, businessName, businessType) {
   const systemInstruction = `You are an expert sales consultant for "Innov2Grow". 

@@ -100,9 +100,11 @@ function App() {
             <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid var(--warning)', color: 'var(--warning)', padding: '16px', borderRadius: '8px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <AlertTriangle size={24} />
               <div>
-                <strong>Notice: AI Fallback Activated.</strong> The backend Groq API key is missing or failed, so the system instantly fell back to static templated data to ensure the demo still loads under 5 seconds.
+                <strong>Notice: AI Fallback Activated.</strong> The backend Groq API call failed. The system instantly fell back to static templated data.
+                <br /><span style={{fontSize: '0.85rem', opacity: 0.8}}>Developer Error Log: {demoData.errorMsg}</span>
               </div>
             </div>
+
           )}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '24px' }}>
